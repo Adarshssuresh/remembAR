@@ -8,11 +8,16 @@
     
     <style>
         #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-family: sans-serif; }
-        .hidden { display: none; }
+        /* Using !important ensures this class overrides all other display properties */
+        .hidden { display: none !important; }
         button { background: #00d1b2; border: none; padding: 15px 40px; color: white; border-radius: 50px; font-size: 18px; cursor: pointer; }
     </style>
 </head>
 <body>
+    <div id="overlay">
+        <h2>Ready to scan?</h2>
+        <button id="start-btn">ENABLE CAMERA</button>
+    </div>
 
     <a-scene mindar-image="imageTargetSrc: ./targets.mind; autoStart: false;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
         <a-assets>
@@ -26,21 +31,38 @@
         </a-entity>
     </a-scene>
 
-    <script>
-        const startBtn = document.querySelector('#start-btn');
-        const sceneEl = document.querySelector('a-scene');
-        const video = document.querySelector('#ar-video');
-        const target = document.querySelector('#photo-target');
+<script>
+    const sceneEl = document.querySelector('a-scene');
+    const overlay = document.querySelector('#overlay');
+    const startButton = document.querySelector('#start-btn'); // Corrected ID
+    const video = document.querySelector('#ar-video');
+    const target = document.querySelector('#photo-target');
 
-        // Startup Logic
-        startBtn.addEventListener('click', () => {
-            document.querySelector('#overlay').classList.add('hidden');
-            sceneEl.systems['mindar-image-system'].start();
-        });
+    startButton.addEventListener('click', () => {
+        // 1. Hide the overlay
+        overlay.classList.add('hidden');
+        
+        // 2. Start the AR system manually
+        const arSystem = sceneEl.systems['mindar-image-system'];
+        arSystem.start(); 
+    });
 
-        // Tracking Logic: Only play video when seen
-        target.addEventListener("targetFound", () => video.play());
-        target.addEventListener("targetLost", () => video.pause());
-    </script>
+    // 3. Logic to handle video playback when target is found/lost
+    target.addEventListener("targetFound", () => {
+        console.log("target found");
+        video.play();
+    });
+
+    target.addEventListener("targetLost", () => {
+        console.log("target lost");
+        video.pause();
+    });
+
+    // 4. Listen for errors like camera permission denied
+    sceneEl.addEventListener("arError", (event) => {
+        console.log("MindAR failed to start", event);
+        alert("Camera error. Please ensure you have allowed camera permissions.");
+    });
+</script>
 </body>
 </html>
