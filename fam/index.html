@@ -2,13 +2,12 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Living Photo</title>
+    <title>AR Living Photo - Multi Video</title>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     
     <style>
         #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-family: sans-serif; }
-        /* Using !important ensures this class overrides all other display properties */
         .hidden { display: none !important; }
         button { background: #00d1b2; border: none; padding: 15px 40px; color: white; border-radius: 50px; font-size: 18px; cursor: pointer; }
     </style>
@@ -21,47 +20,57 @@
 
     <a-scene mindar-image="imageTargetSrc: ./targets.mind; autoStart: false;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
         <a-assets>
-            <video id="ar-video" src="./video.mp4" loop="true" playsinline crossorigin="anonymous"></video>
+            <video id="video1" src="./video1.mp4" loop="true" playsinline crossorigin="anonymous"></video>
+            <video id="video2" src="./video2.mp4" loop="true" playsinline crossorigin="anonymous"></video>
         </a-assets>
 
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-        <a-entity id="photo-target" mindar-image-target="targetIndex: 0">
-            <a-video src="#ar-video" width="1" height="0.6" position="0 0 0"></a-video>
+        <a-entity id="photo-target-0" mindar-image-target="targetIndex: 0">
+            <a-video src="#video1" width="1" height="0.6" position="0 0 0"></a-video>
+        </a-entity>
+
+        <a-entity id="photo-target-1" mindar-image-target="targetIndex: 1">
+            <a-video src="#video2" width="1" height="0.6" position="0 0 0"></a-video>
         </a-entity>
     </a-scene>
 
 <script>
     const sceneEl = document.querySelector('a-scene');
     const overlay = document.querySelector('#overlay');
-    const startButton = document.querySelector('#start-btn'); // Corrected ID
-    const video = document.querySelector('#ar-video');
-    const target = document.querySelector('#photo-target');
+    const startButton = document.querySelector('#start-btn');
 
+    // Startup Logic
     startButton.addEventListener('click', () => {
-        // 1. Hide the overlay
         overlay.classList.add('hidden');
-        
-        // 2. Start the AR system manually
         const arSystem = sceneEl.systems['mindar-image-system'];
         arSystem.start(); 
     });
 
-    // 3. Logic to handle video playback when target is found/lost
-    target.addEventListener("targetFound", () => {
-        console.log("target found");
-        video.play();
+    // Handle Video Playback for Target 0
+    const target0 = document.querySelector('#photo-target-0');
+    const video1 = document.querySelector('#video1');
+    target0.addEventListener("targetFound", () => {
+        console.log("target 0 found");
+        video1.play();
+    });
+    target0.addEventListener("targetLost", () => {
+        video1.pause();
     });
 
-    target.addEventListener("targetLost", () => {
-        console.log("target lost");
-        video.pause();
+    // Handle Video Playback for Target 1
+    const target1 = document.querySelector('#photo-target-1');
+    const video2 = document.querySelector('#video2');
+    target1.addEventListener("targetFound", () => {
+        console.log("target 1 found");
+        video2.play();
+    });
+    target1.addEventListener("targetLost", () => {
+        video2.pause();
     });
 
-    // 4. Listen for errors like camera permission denied
     sceneEl.addEventListener("arError", (event) => {
-        console.log("MindAR failed to start", event);
-        alert("Camera error. Please ensure you have allowed camera permissions.");
+        alert("Camera error. Please ensure permissions are allowed.");
     });
 </script>
 </body>
