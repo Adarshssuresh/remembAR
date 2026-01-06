@@ -22,6 +22,7 @@
         <a-assets>
             <video id="video1" src="./video1.mp4" loop="true" playsinline crossorigin="anonymous"></video>
             <video id="video2" src="./video2.mp4" loop="true" playsinline crossorigin="anonymous"></video>
+            <video id="video3" src="./video3.mp4" loop="true" playsinline crossorigin="anonymous"></video>
         </a-assets>
 
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
@@ -32,6 +33,9 @@
 
         <a-entity id="photo-target-1" mindar-image-target="targetIndex: 1">
             <a-video src="#video2" width="1" height="0.6" position="0 0 0"></a-video>
+        </a-entity>
+        <a-entity id="photo-target-3" mindar-image-target="targetIndex: 1">
+            <a-video src="#video3" width="1" height="0.6" position="0 0 0"></a-video>
         </a-entity>
     </a-scene>
 
